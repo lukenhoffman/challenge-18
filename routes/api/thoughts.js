@@ -1,12 +1,14 @@
 const router = require('express').Router();
 const { getAllThoughts, getThoughtById } = require('../../controllers/thoughtController');
 
-// GET all thoughts
+// Routes related to Thoughts
+
+// Route to GET all thoughts
 router.get('/', getAllThoughts);
 
-// GET a single thought by its _id
+// Route to GET a single thought by its _id
 router.get('/:id', getThoughtById);
 
-// Add other routes (POST, PUT, DELETE)
+// TODO: Add other routes (POST, PUT, DELETE) for thought manipulation
 
 module.exports = router;
