@@ -1,5 +1,6 @@
 const router = require('express').Router();
-const { getAllUsers, getUserById } = require('../controllers/userControllers.js');
+const { getAllUsers, getUserById, testFunction } = require('C:/Users/Luken Hoffman/Downloads/OSU-Bootcamp/challenge-18/controllers/userController.js');
+testFunction();
 
 // Routes related to Users
 
