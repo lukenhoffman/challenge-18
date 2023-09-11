@@ -1,63 +1,69 @@
-const { Schema, model, Types } = require('mongoose');
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-// Reaction Schema
-const ReactionSchema = new Schema(
-  {
-    reactionId: {
-      type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId()
+// Subdocument schema for reactions
+const reactionSchema = new Schema(
+    {
+        reactionId: {
+            type: Schema.Types.ObjectId,
+            default: () => new mongoose.Types.ObjectId()
+        },
+        reactionBody: {
+            type: String,
+            required: true,
+            maxlength: 280
+        },
+        username: {
+            type: String,
+            required: true
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now,
+            get: createdAtVal => new Date(createdAtVal).toLocaleDateString('en-US')
+        }
     },
-    reactionBody: {
-      type: String,
-      required: true,
-      maxLength: 280
-    },
-    username: {
-      type: String,
-      required: true
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      get: (timestamp) => dateFormat(timestamp)
+    {
+        toJSON: {
+            getters: true
+        }
     }
-  },
-  {
-    toJSON: {
-      getters: true
-    }
-  }
 );
 
-// Thought Schema
-const ThoughtSchema = new Schema(
-  {
-    thoughtText: {
-      type: String,
-      required: true,
-      minLength: 1,
-      maxLength: 280
+// Main schema for thoughts
+const thoughtSchema = new Schema(
+    {
+        thoughtText: {
+            type: String,
+            required: true,
+            minlength: 1,
+            maxlength: 280
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now,
+            get: createdAtVal => new Date(createdAtVal).toLocaleDateString('en-US')
+        },
+        username: {
+            type: String,
+            required: true
+        },
+        reactions: [reactionSchema]
     },
-    username: {
-      type: String,
-      required: true
-    },
-    reactions: [ReactionSchema]
-  },
-  {
-    toJSON: {
-      virtuals: true,
-      getters: true
-    },
-    timestamps: true  // This will add both `createdAt` and `updatedAt` fields
-  }
+    {
+        toJSON: {
+            virtuals: true,
+            getters: true
+        },
+        id: false
+    }
 );
 
-// Virtual property to retrieve the length of the thought's reactions array field on query
-ThoughtSchema.virtual('reactionCount').get(function() {
+// Virtual property to get the number of reactions
+thoughtSchema.virtual('reactionCount').get(function() {
     return this.reactions.length;
 });
 
-const Thought = model('Thought', ThoughtSchema);
+const Thought = mongoose.model('Thought', thoughtSchema);
 
 module.exports = Thought;
