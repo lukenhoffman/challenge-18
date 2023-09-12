@@ -1,7 +1,3 @@
-Object.keys(require.cache).forEach(function(key) {
-  delete require.cache[key];
-});
-
 const express = require('express');
 const mongoose = require('mongoose');
 const routes = require('./routes');
@@ -15,9 +11,6 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-
-// API routes
-app.use('/api', routes);
 
 // MongoDB connection
 mongoose.connect(
@@ -33,14 +26,13 @@ dbConnection.on('error', err => console.error(`Mongoose connection error: ${err}
 dbConnection.once('open', () => console.log('Mongoose connected successfully.'));
 mongoose.set('debug', true);
 
+// API routes
+app.use('/api', routes);
+
 // Error handling
 app.use((err, req, res, next) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.error(err.stack);
-    res.status(500).send(err.message);
-  } else {
-    res.status(500).send('Something broke!');
-  }
+  console.error(err.stack);
+  res.status(500).send(err.message);
 });
 
 app.listen(PORT, () => {
