@@ -67,15 +67,50 @@ const userController = {
             });
     },
 
-    // Add a friend to a user's friend list
-    addFriend({ params }, res) {
-        // Implementation for adding a friend goes here
-    },
+// Add a friend to a user's friend list
+addFriend({ params }, res) {
+    User.findByIdAndUpdate(
+        params.id, // Find user by their ID
+        { $push: { friends: params.friendId } }, // Push friend's ID to user's friends array
+        { new: true, runValidators: true } // Return updated user and run validations
+    )
+    .populate({
+        path: 'friends',
+        select: '-__v'
+    })
+    .select('-__v')
+    .then(dbUserData => {
+        if (!dbUserData) {
+            res.status(404).json({ message: 'No user found with this ID!' });
+            return;
+        }
+        res.json(dbUserData);
+    })
+    .catch(err => res.json(err));
+},
 
-    // Remove a friend from a user's friend list
-    removeFriend({ params }, res) {
-        // Implementation for removing a friend goes here
-    }
+// Remove a friend from a user's friend list
+removeFriend({ params }, res) {
+    User.findByIdAndUpdate(
+        params.id, // Find user by their ID
+        { $pull: { friends: params.friendId } }, // Pull friend's ID from user's friends array
+        { new: true, runValidators: true } // Return updated user and run validations
+    )
+    .populate({
+        path: 'friends',
+        select: '-__v'
+    })
+    .select('-__v')
+    .then(dbUserData => {
+        if (!dbUserData) {
+            res.status(404).json({ message: 'No user found with this ID!' });
+            return;
+        }
+        res.json(dbUserData);
+    })
+    .catch(err => res.json(err));
+}
+
 };
 
 module.exports = userController;
